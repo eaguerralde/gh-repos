@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
-import { RepositoryRow, IRepository } from './RepositoryRow';
+import { useState } from 'react';
+import { RepositoriesTable } from './RepositoriesTable';
 
 const SEARCH_REPOS = gql`
   query search($searchTerm: String!) {
@@ -24,23 +25,29 @@ const SEARCH_REPOS = gql`
 `;
 
 export function Search() {
+  const [searchTerm, setSearchTerm] = useState<string | undefined>('@yougov');
   const { loading, error, data } = useQuery(SEARCH_REPOS, {
-    variables: { searchTerm: '@yougov' }
+    variables: { searchTerm: searchTerm }
   });
+  let content;
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error : {error.message}</p>;
-
-  const repoRows = data.search.nodes.map((repository: IRepository) => RepositoryRow(repository));
+  if (loading) {
+    content = <p>Loading...</p>;
+  } else if (error) {
+    content = <p>Error : {error.message}</p>;
+  } else {
+    content = RepositoriesTable(data);
+  }
 
   return (
-    <table>
-      <tr>
-        <th>Name</th>
-        <th>Stars</th>
-        <th>Forks</th>
-      </tr>
-      {repoRows}
-    </table>
+    <>
+      <input
+        autoFocus
+        value={searchTerm}
+        name="searchTerm"
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      {content}
+    </>
   );
 }

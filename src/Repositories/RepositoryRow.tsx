@@ -1,10 +1,4 @@
-export interface IRepository {
-  id: number;
-  name: string;
-  url: string;
-  stargazerCount: number;
-  forkCount: number;
-}
+import { IRepository } from './types';
 
 export function RepositoryRow(repository: IRepository) {
   return (
